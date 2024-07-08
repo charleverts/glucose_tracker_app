@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import warnings
 import plotly.express as px
+import plotly.graph_objects as go
 
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
@@ -229,6 +230,82 @@ fig3.update_layout(
     )
 )
 
+### Fig 4
+
+# Convert the DataFrame to long format for Plotly Express
+glucose_df_long = glucose_df[['Morning (07:15)','Lunch (12:50)', 
+                              'Dinner (18:30)', 'BedTime (21:45)']]\
+                              .melt(var_name='Category', value_name='Value')
+
+# Define specific colors for each line
+colors = ['#074173']
+
+# Create the box plot
+fig4 = px.box(glucose_df_long, x='Category', y='Value', 
+             title='Box Plot of Glucose Readings', points="all",
+             color_discrete_sequence=colors)
+
+fig4.update_layout(
+    title = {'y':0.85,
+             'x':0.5,
+             'xanchor': 'center',
+             'yanchor': 'top'})
+
+# Update layout to change minimum value on y-axis
+fig4.update_layout(
+    yaxis=dict(title='Glucose Levels')  # Set minimum y-axis value to 50
+)
+
+### Fig 5
+
+# Calculate mean for each category
+means = glucose_df_long.groupby('Category')['Value'].mean().reset_index()
+
+# Create the strip plot
+fig5 = px.strip(glucose_df_long, x='Category', y='Value',
+               title='All Glucose Readings')
+
+# Add mean points as red dots
+fig5.add_trace(go.Scatter(
+    x=means['Category'],
+    y=means['Value'],
+    mode='markers',
+    marker=dict(color='red', size=5),
+    name='Mean'
+))
+
+# Add line connecting mean points
+fig5.add_trace(go.Scatter(
+    x=means['Category'],
+    y=means['Value'],
+    mode='lines+markers',
+    marker=dict(color='red'),
+    line=dict(color='grey', dash='dash'),
+    name='Mean Line'
+))
+
+fig5.update_layout(
+    title = {'y':0.85,
+             'x':0.5,
+             'xanchor': 'center',
+             'yanchor': 'top'})
+
+# Update layout to change minimum value on y-axis
+fig5.update_layout(
+    yaxis=dict(title='Glucose Levels')  # Set minimum y-axis value to 50
+)
+
+# Update layout to move legend position on x-axis
+fig5.update_layout(
+    legend=dict(
+        x=0.15,  # Position the legend horizontally at 50% of the plot width
+        y=0.95,
+        xanchor='center',  # Center alignment of the legend
+        yanchor='top'  # Align legend to the top of the plot
+    )
+)
+
+
 ### Set layout
 
 st.set_page_config(page_title = 'Glucose Tracker',  layout = 'wide', 
@@ -268,6 +345,10 @@ st.plotly_chart(fig1)
 st.plotly_chart(fig2)
 
 st.plotly_chart(fig3)
+
+st.plotly_chart(fig4)
+
+st.plotly_chart(fig5)
 
 #
 #col1, col2 = st.columns(2)
