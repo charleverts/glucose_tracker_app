@@ -242,7 +242,7 @@ colors = ['#074173']
 
 # Create the box plot
 fig4 = px.box(glucose_df_long, x='Category', y='Value', 
-             title='Box Plot of Glucose Readings', points="all",
+             title='Box Plot of All Glucose Readings', points="all",
              color_discrete_sequence=colors)
 
 fig4.update_layout(
@@ -305,6 +305,72 @@ fig5.update_layout(
     )
 )
 
+### Fig6
+
+# Create the box plot
+fig6 = px.box(glucose_df_long, x='Category', y='Value', 
+             title='Box Plot of 7-day Glucose Readings', points="all",
+             color_discrete_sequence=colors)
+
+fig6.update_layout(
+    title = {'y':0.85,
+             'x':0.5,
+             'xanchor': 'center',
+             'yanchor': 'top'})
+
+# Update layout to change minimum value on y-axis
+fig6.update_layout(
+    yaxis=dict(title='Glucose Levels')  # Set minimum y-axis value to 50
+)
+
+### Fig7
+
+# Calculate mean for each category
+means = glucose_df_long.groupby('Category')['Value'].mean().reset_index()
+
+# Create the strip plot
+fig7 = px.strip(glucose_df_long, x='Category', y='Value',
+               title='7-day Glucose Readings')
+
+# Add mean points as red dots
+fig7.add_trace(go.Scatter(
+    x=means['Category'],
+    y=means['Value'],
+    mode='markers',
+    marker=dict(color='red', size=5),
+    name='Mean'
+))
+
+# Add line connecting mean points
+fig7.add_trace(go.Scatter(
+    x=means['Category'],
+    y=means['Value'],
+    mode='lines+markers',
+    marker=dict(color='red'),
+    line=dict(color='grey', dash='dash'),
+    name='Mean Line'
+))
+
+fig7.update_layout(
+    title = {'y':0.85,
+             'x':0.5,
+             'xanchor': 'center',
+             'yanchor': 'top'})
+
+# Update layout to change minimum value on y-axis
+fig7.update_layout(
+    yaxis=dict(title='Glucose Levels')  # Set minimum y-axis value to 50
+)
+
+# Update layout to move legend position on x-axis
+fig7.update_layout(
+    legend=dict(
+        x=0.15,  # Position the legend horizontally at 50% of the plot width
+        y=0.95,
+        xanchor='center',  # Center alignment of the legend
+        yanchor='top'  # Align legend to the top of the plot
+    )
+)
 
 ### Set layout
 
@@ -349,6 +415,10 @@ st.plotly_chart(fig3)
 st.plotly_chart(fig4)
 
 st.plotly_chart(fig5)
+
+st.plotly_chart(fig6)
+
+st.plotly_chart(fig7)
 
 #
 #col1, col2 = st.columns(2)
