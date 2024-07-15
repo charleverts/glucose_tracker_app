@@ -242,7 +242,7 @@ colors = ['#074173']
 
 # Create the box plot
 fig4 = px.box(glucose_df_long, x='Category', y='Value', 
-             title='Box Plot of All Glucose Readings', points="all",
+             title='All Glucose Readings', points="all",
              color_discrete_sequence=colors)
 
 fig4.update_layout(
@@ -305,35 +305,46 @@ fig5.update_layout(
     )
 )
 
-### Fig6
+### Fig8
+
+glucose_df_last_week = glucose_df.tail(7)
+glucose_df_last_week = glucose_df_last_week.reset_index(drop=True)
+
+# Convert the DataFrame to long format for Plotly Express
+glucose_df_last_week_long = glucose_df_last_week[['Morning (07:15)','Lunch (12:50)', 
+                              'Dinner (18:30)', 'BedTime (21:45)']]\
+                              .melt(var_name='Category', value_name='Value')
+
+# Define specific colors for each line
+colors = ['#074173']
 
 # Create the box plot
-fig6 = px.box(glucose_df_long, x='Category', y='Value', 
-             title='Box Plot of 7-day Glucose Readings', points="all",
+fig8 = px.box(glucose_df_last_week_long, x='Category', y='Value', 
+             title='Last 7 days Glucose Readings', points="all",
              color_discrete_sequence=colors)
 
-fig6.update_layout(
+fig8.update_layout(
     title = {'y':0.85,
              'x':0.5,
              'xanchor': 'center',
              'yanchor': 'top'})
 
 # Update layout to change minimum value on y-axis
-fig6.update_layout(
+fig8.update_layout(
     yaxis=dict(title='Glucose Levels')  # Set minimum y-axis value to 50
 )
 
-### Fig7
+### Fig9
 
 # Calculate mean for each category
-means = glucose_df_long.groupby('Category')['Value'].mean().reset_index()
+means = glucose_df_last_week_long.groupby('Category')['Value'].mean().reset_index()
 
 # Create the strip plot
-fig7 = px.strip(glucose_df_long, x='Category', y='Value',
-               title='7-day Glucose Readings')
+fig9 = px.strip(glucose_df_last_week_long, x='Category', y='Value',
+               title='Last 7 days Glucose Readings')
 
 # Add mean points as red dots
-fig7.add_trace(go.Scatter(
+fig9.add_trace(go.Scatter(
     x=means['Category'],
     y=means['Value'],
     mode='markers',
@@ -342,7 +353,7 @@ fig7.add_trace(go.Scatter(
 ))
 
 # Add line connecting mean points
-fig7.add_trace(go.Scatter(
+fig9.add_trace(go.Scatter(
     x=means['Category'],
     y=means['Value'],
     mode='lines+markers',
@@ -351,19 +362,19 @@ fig7.add_trace(go.Scatter(
     name='Mean Line'
 ))
 
-fig7.update_layout(
+fig9.update_layout(
     title = {'y':0.85,
              'x':0.5,
              'xanchor': 'center',
              'yanchor': 'top'})
 
 # Update layout to change minimum value on y-axis
-fig7.update_layout(
+fig9.update_layout(
     yaxis=dict(title='Glucose Levels')  # Set minimum y-axis value to 50
 )
 
 # Update layout to move legend position on x-axis
-fig7.update_layout(
+fig9.update_layout(
     legend=dict(
         x=0.15,  # Position the legend horizontally at 50% of the plot width
         y=0.95,
@@ -412,14 +423,32 @@ st.plotly_chart(fig2)
 
 st.plotly_chart(fig3)
 
-st.plotly_chart(fig4)
+# Set y-axis range for both figures
+fig4.update_yaxes(range=[5, 20])
+fig8.update_yaxes(range=[5, 20])
 
-st.plotly_chart(fig5)
+# Layout the Streamlit app with two columns
+col1, col2 = st.columns(2)
 
-st.plotly_chart(fig6)
+with col1:
+    st.plotly_chart(fig4)
 
-st.plotly_chart(fig7)
+with col2:
+    st.plotly_chart(fig8)
 
+# Set y-axis range for both figures
+fig5.update_yaxes(range=[5, 20])
+fig9.update_yaxes(range=[5, 20])
+
+# Layout the Streamlit app with two columns
+col1, col2 = st.columns(2)
+
+with col1:
+    st.plotly_chart(fig5)
+
+with col2:
+    st.plotly_chart(fig9)
+    
 #
 #col1, col2 = st.columns(2)
 #
