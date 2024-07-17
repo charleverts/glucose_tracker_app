@@ -63,6 +63,13 @@ def cleaned_data(filename):
 
 glucose_df = cleaned_data('DiabetesTracker.xlsx')
 
+mean_all_time = round(glucose_df[['Morning (07:15)', 'Lunch (12:50)', 'Dinner (18:30)', 'BedTime (21:45)']].mean().mean(), 1)
+mean_last_30 = round(glucose_df.tail(30)[['Morning (07:15)', 'Lunch (12:50)', 'Dinner (18:30)', 'BedTime (21:45)']].mean().mean(), 1)
+mean_last_7 = round(glucose_df.tail(7)[['Morning (07:15)', 'Lunch (12:50)', 'Dinner (18:30)', 'BedTime (21:45)']].mean().mean(), 1)
+
+diff_all = mean_last_30 - mean_all_time 
+diff_30 = mean_last_7 - mean_last_30 
+
 # Fig
 
 fig_cols_1 = ['Morning (07:15)', 'Lunch (12:50)',
@@ -434,13 +441,17 @@ col1, col2, col3, col4, col5 = st.columns(5)
 #     st.image("images/HB.png")
 
 with st.sidebar:
-    text_0 = st.write("💻 This page displays the metrics relating to Barkeep's usage and data.")
+    text_0 = st.write("💻 This page displays the metrics relating to my Blood Glucose levels.")
     text_1 = st.write("📊 The graphs are interactive: hover for info, click and drag to zoom, click on legend to add or remove components.")
-    # st.metric(label="🍷Barkeep Interactions Today", value = f"{todays_interactions}", delta = f"{difference} vs daily average")
-    # st.metric(label="🕵️‍♂️Stock Search Interactions Today", value = f"{SS_today}", delta = f"{SS_difference} vs daily average")
-    # st.metric(label="TOTAL Interactions Today", value = f"{todays_interactions+SS_today}")
 
+    st.metric(label="Average of All Readings", value = f"{mean_all_time}", delta_color="inverse")
+   
+    st.metric(label="Average of last 30 days Readings", value = f"{mean_last_30}", delta = f"{diff_all} vs All Time", delta_color="inverse")
 
+    st.metric(label="Average of last 7 days Readings", value = f"{mean_last_7}", delta = f"{diff_30} vs last 30 days", delta_color="inverse")
+    
+
+ 
 # Charts
 
 # Set y-axis range for both figures
