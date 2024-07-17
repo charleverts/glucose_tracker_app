@@ -383,6 +383,34 @@ fig9.update_layout(
     )
 )
 
+# Add transparent green box between y=4 and y=7
+fig9.add_shape(
+    type="rect",
+    xref="paper", yref="y",
+    x0=0, y0=4, x1=1, y1=7,
+    fillcolor="green",
+    opacity=0.2,
+    layer="below",
+    line=dict(
+        width=0,
+    )
+)
+
+# Add dashed horizontal lines at y=4 and y=7
+fig9.add_shape(
+    type="line",
+    xref="paper", yref="y",
+    x0=0, y0=4, x1=1, y1=4,
+    line=dict(color="green", width=1, dash="dash")
+)
+
+fig9.add_shape(
+    type="line",
+    xref="paper", yref="y",
+    x0=0, y0=7, x1=1, y1=7,
+    line=dict(color="green", width=1, dash="dash")
+)
+
 ### Set layout
 
 st.set_page_config(page_title = 'Glucose Tracker',  layout = 'wide', 
@@ -415,6 +443,9 @@ with st.sidebar:
 
 # Charts
 
+# Set y-axis range for both figures
+fig.update_yaxes(range=[0, 20])
+
 st.plotly_chart(fig)
 
 st.plotly_chart(fig1)
@@ -424,8 +455,8 @@ st.plotly_chart(fig2)
 st.plotly_chart(fig3)
 
 # Set y-axis range for both figures
-fig4.update_yaxes(range=[5, 20])
-fig8.update_yaxes(range=[5, 20])
+fig4.update_yaxes(range=[0, 20])
+fig8.update_yaxes(range=[0, 20])
 
 # Layout the Streamlit app with two columns
 col1, col2 = st.columns(2)
@@ -437,8 +468,8 @@ with col2:
     st.plotly_chart(fig8)
 
 # Set y-axis range for both figures
-fig5.update_yaxes(range=[5, 20])
-fig9.update_yaxes(range=[5, 20])
+fig5.update_yaxes(range=[0, 20])
+fig9.update_yaxes(range=[0, 20])
 
 # Layout the Streamlit app with two columns
 col1, col2 = st.columns(2)
