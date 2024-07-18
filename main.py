@@ -70,6 +70,45 @@ mean_last_7 = round(glucose_df.tail(7)[['Morning (07:15)', 'Lunch (12:50)', 'Din
 diff_all = round(mean_last_30 - mean_all_time, 1)
 diff_30 = round(mean_last_7 - mean_last_30, 1)
 
+# Convert the DataFrame to long format for Plotly Express
+glucose_df_long = glucose_df[['Morning (07:15)','Lunch (12:50)', 
+                              'Dinner (18:30)', 'BedTime (21:45)']]\
+                              .melt(var_name='Category', value_name='Value')
+                              
+def value_to_rank(value):
+    if value < 3:
+        return 'very low'
+    elif 3 <= value < 4:
+        return 'low'
+    elif 4 <= value < 7:
+        return 'good'
+    elif 7 <= value < 10:
+        return 'high'
+    elif 10 <= value < 15:
+        return 'very high'
+    elif value >= 15:
+        return 'extremely high'
+    
+glucose_df_long['Rank'] = glucose_df_long['Value'].apply(value_to_rank)
+
+glucose_df_long = glucose_df_long.dropna()
+
+pie_df = pd.DataFrame(glucose_df_long['Rank'].value_counts()).reset_index()
+
+# Rename columns using a dictionary
+pie_df.rename(columns={'index': 'Reading_Type',
+                       'Rank': 'Count'}, 
+                       inplace = True)
+
+# Define the desired order
+Reading_Type_order = ['low', 'good', 'high', 'very high', 'extremely high']
+
+# Convert the 'Category' column to a categorical type with the specified order
+pie_df['Reading_Type'] = pd.Categorical(pie_df['Reading_Type'], categories=Reading_Type_order, ordered=True)
+
+# Sort the DataFrame by the 'Category' column
+pie_df = pie_df.sort_values('Reading_Type')
+
 # Fig
 
 fig_cols_1 = ['Morning (07:15)', 'Lunch (12:50)',
@@ -418,6 +457,34 @@ fig9.add_shape(
     line=dict(color="green", width=1, dash="dash")
 )
 
+### Fig10
+labels = pie_df['Reading_Type']
+values = pie_df['Count']
+
+colors = ['#9BEC00','#F8DE22','#FF8A08','#E72929']
+
+fig10 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+fig10.update_traces(marker=dict(colors=colors, line=dict(color='#9DB2BF', width=1)))
+
+fig10.update_layout(
+    title={
+        'text': 'Rank Counts by Category',
+        'x': 0.5,  # Horizontal position of the title (0: left, 0.5: center, 1: right)
+        'xanchor': 'center'  # Anchor point of the title text
+    },
+    legend=dict(
+        x=0.7,  # Position it horizontally (0: left, 1: right)
+        y=0.8,  # Position it vertically (0: bottom, 1: top)
+        xanchor='left',  # Use 'left', 'center', or 'right' for horizontal alignment
+        yanchor='middle',  # Use 'top', 'middle', or 'bottom' for vertical alignment
+        bordercolor='Black',  # Border color
+        borderwidth=1  # Border width
+    )
+)
+
+
+
 ### Set layout
 
 st.set_page_config(page_title = 'Glucose Tracker',  layout = 'wide', 
@@ -457,11 +524,20 @@ with st.sidebar:
 # Set y-axis range for both figures
 fig.update_yaxes(range=[0, 20])
 
-st.plotly_chart(fig)
+# Layout the Streamlit app with two columns
+col1, col2 = st.columns(2)
 
-st.plotly_chart(fig1)
+with col1:
+    st.plotly_chart(fig)
 
-st.plotly_chart(fig2)
+with col2:
+    st.plotly_chart(fig10)
+
+with col1:
+    st.plotly_chart(fig1)
+
+with col2:
+    st.plotly_chart(fig2)
 
 st.plotly_chart(fig3)
 
