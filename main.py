@@ -67,8 +67,8 @@ mean_all_time = round(glucose_df[['Morning (07:15)', 'Lunch (12:50)', 'Dinner (1
 mean_last_30 = round(glucose_df.tail(30)[['Morning (07:15)', 'Lunch (12:50)', 'Dinner (18:30)', 'BedTime (21:45)']].mean().mean(), 1)
 mean_last_7 = round(glucose_df.tail(7)[['Morning (07:15)', 'Lunch (12:50)', 'Dinner (18:30)', 'BedTime (21:45)']].mean().mean(), 1)
 
-diff_all = mean_last_30 - mean_all_time 
-diff_30 = mean_last_7 - mean_last_30 
+diff_all = round(mean_last_30 - mean_all_time, 1)
+diff_30 = round(mean_last_7 - mean_last_30, 1)
 
 # Fig
 
@@ -444,11 +444,11 @@ with st.sidebar:
     text_0 = st.write("💻 This page displays the metrics relating to my Blood Glucose levels.")
     text_1 = st.write("📊 The graphs are interactive: hover for info, click and drag to zoom, click on legend to add or remove components.")
 
-    st.metric(label="Average of All Readings", value = f"{mean_all_time}", delta_color="inverse")
+    st.metric(label="Average of All Readings", value = f"{mean_all_time} mmol/L", delta_color="inverse")
    
-    st.metric(label="Average of last 30 days Readings", value = f"{mean_last_30}", delta = f"{diff_all} vs All Time", delta_color="inverse")
+    st.metric(label="Average of last 30 days Readings", value = f"{mean_last_30} mmol/L", delta = f"{diff_all} vs All Time", delta_color="inverse")
 
-    st.metric(label="Average of last 7 days Readings", value = f"{mean_last_7}", delta = f"{diff_30} vs last 30 days", delta_color="inverse")
+    st.metric(label="Average of last 7 days Readings", value = f"{mean_last_7} mmol/L", delta = f"{diff_30} vs last 30 days", delta_color="inverse")
     
 
  
