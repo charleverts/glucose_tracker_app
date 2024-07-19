@@ -461,7 +461,7 @@ fig9.add_shape(
 labels = pie_df['Reading_Type']
 values = pie_df['Count']
 
-colors = ['#9BEC00','#F8DE22','#FF8A08','#E72929']
+colors = ['#059212','#FCDC2A','#FF8400','#E72929']
 
 fig10 = go.Figure(data=[go.Pie(labels=labels, values=values)])
 
@@ -475,7 +475,7 @@ fig10.update_layout(
     },
     legend=dict(
         x=0.7,  # Position it horizontally (0: left, 1: right)
-        y=0.8,  # Position it vertically (0: bottom, 1: top)
+        y=0.95,  # Position it vertically (0: bottom, 1: top)
         xanchor='left',  # Use 'left', 'center', or 'right' for horizontal alignment
         yanchor='middle',  # Use 'top', 'middle', or 'bottom' for vertical alignment
         bordercolor='Black',  # Border color
@@ -525,19 +525,20 @@ with st.sidebar:
 fig.update_yaxes(range=[0, 20])
 
 # Layout the Streamlit app with two columns
+# Create columns with specified proportions
+col1, col2 = st.columns([2, 1])
+with col1:
+    st.plotly_chart(fig, use_container_width=True) 
+
+with col2:
+    st.plotly_chart(fig10, use_container_width=True)
+
 col1, col2 = st.columns(2)
-
 with col1:
-    st.plotly_chart(fig)
+    st.plotly_chart(fig1, use_container_width=True)
 
 with col2:
-    st.plotly_chart(fig10)
-
-with col1:
-    st.plotly_chart(fig1)
-
-with col2:
-    st.plotly_chart(fig2)
+    st.plotly_chart(fig2, use_container_width=True)
 
 st.plotly_chart(fig3)
 
@@ -549,10 +550,10 @@ fig8.update_yaxes(range=[0, 20])
 col1, col2 = st.columns(2)
 
 with col1:
-    st.plotly_chart(fig4)
+    st.plotly_chart(fig4, use_container_width=True)
 
 with col2:
-    st.plotly_chart(fig8)
+    st.plotly_chart(fig8, use_container_width=True)
 
 # Set y-axis range for both figures
 fig5.update_yaxes(range=[0, 20])
@@ -562,10 +563,10 @@ fig9.update_yaxes(range=[0, 20])
 col1, col2 = st.columns(2)
 
 with col1:
-    st.plotly_chart(fig5)
+    st.plotly_chart(fig5, use_container_width=True)
 
 with col2:
-    st.plotly_chart(fig9)
+    st.plotly_chart(fig9, use_container_width=True)
     
 #
 #col1, col2 = st.columns(2)
