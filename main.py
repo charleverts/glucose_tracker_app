@@ -215,7 +215,7 @@ fig1.update_layout(
 # Fig2
 
 # Define specific colors for each line
-colors = ['#31363F']
+colors = ['#758694']
 
 fig2 = px.line(glucose_df, x="Date", y="Weight", title='Weight',
               markers=True, color_discrete_sequence=colors)
@@ -245,7 +245,7 @@ fig2.update_layout(
 # Fig3
 
 # Define specific colors for each line
-colors = ['#540375']
+colors = ['#FFC7ED']
 
 fig3 = px.line(glucose_df, x="Date", y="Sleep", title='Sleep',
               markers=True, color_discrete_sequence=colors)
