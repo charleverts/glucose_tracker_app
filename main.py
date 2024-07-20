@@ -85,31 +85,15 @@ def value_to_rank(value):
     elif 4 <= value < 7:
         return 'good'
     elif 7 <= value < 10:
-        return 'high'
+        return 'elevated'
     elif 10 <= value < 15:
-        return 'very high'
+        return 'high'
     elif value >= 15:
         return 'extremely high'
     
 glucose_df_long['Rank'] = glucose_df_long['Value'].apply(value_to_rank)
 
 glucose_df_long = glucose_df_long.dropna()
-
-pie_df = pd.DataFrame(glucose_df_long['Rank'].value_counts()).reset_index()
-
-# Rename columns using a dictionary
-pie_df.rename(columns={'index': 'Reading_Type',
-                       'Rank': 'Count'}, 
-                       inplace = True)
-
-# Define the desired order
-Reading_Type_order = ['low', 'good', 'high', 'very high', 'extremely high']
-
-# Convert the 'Category' column to a categorical type with the specified order
-pie_df['Reading_Type'] = pd.Categorical(pie_df['Reading_Type'], categories=Reading_Type_order, ordered=True)
-
-# Sort the DataFrame by the 'Category' column
-pie_df = pie_df.sort_values('Reading_Type')
 
 # Fig
 
@@ -464,9 +448,6 @@ fig9.add_shape(
 )
 
 
-
-
-
 ### Set layout
 
 st.set_page_config(page_title = 'Glucose Tracker',  layout = 'wide', 
@@ -501,8 +482,6 @@ with st.sidebar:
 
     st.metric(label="Average of last 7 days Readings", value = f"{mean_last_7} mmol/L", delta = f"{diff_30} vs last 30 days", delta_color="inverse")
     
-    
- 
 # Charts
 
 # Set y-axis range for both figures
@@ -510,28 +489,87 @@ fig.update_yaxes(range=[0, 20])
 
 # Layout the Streamlit app with two columns
 # Create columns with specified proportions
-col1, col2, col3 = st.columns([4, 2, 2])
+col1, col2, col3 = st.columns([4, 1, 2])
 
 with col1:
-    st.success('126 blood glucose readings have been recorded since 19 June 2024.', icon="🎯")
+    st.success('126 Blood Glucose readings have been recorded since 19 June 2024.', icon="🎯")
 
 with col3:
-    genre = st.radio("Select the pie chart's time horizon:",
-                    ["All Readings", "Last 30 days", "Last 7 days"])
+    st.markdown("**Select the pie chart's time horizon:**")
+    time_horizon = st.radio("",
+                           ["All Readings", "Last 30 days", "Last 7 days"],
+                           label_visibility="collapsed")
+
+### Fig10
+
+# Perform actions based on selection
+if time_horizon == "All Readings":
+    time_horizon_value = glucose_df.shape[0]
+    # Add any specific calculation or action for comedy here
+elif time_horizon == "Last 30 days":
+    time_horizon_value = 30
+    # Add any specific calculation or action for drama here
+else: #"Last 7 days"
+    time_horizon_value = 7
+
+glucose_df_long = glucose_df.tail(time_horizon_value)[['Morning (07:15)','Lunch (12:50)', 
+                              'Dinner (18:30)', 'BedTime (21:45)']]\
+                              .melt(var_name='Category', value_name='Value')
+                              
+def value_to_rank(value):
+    if value < 3:
+        return 'very low'
+    elif 3 <= value < 4:
+        return 'low'
+    elif 4 <= value < 7:
+        return 'good'
+    elif 7 <= value < 10:
+        return 'high'
+    elif 10 <= value < 15:
+        return 'very high'
+    elif value >= 15:
+        return 'extremely high'
+    
+glucose_df_long['Rank'] = glucose_df_long['Value'].apply(value_to_rank)
+
+glucose_df_long = glucose_df_long.dropna()
+
+pie_df = pd.DataFrame(glucose_df_long['Rank'].value_counts()).reset_index()
+
+# Rename columns using a dictionary
+pie_df.rename(columns={'index': 'Reading_Type',
+                       'Rank': 'Count'}, 
+                       inplace = True)
+
+# Define the desired order
+Reading_Type_order = ['low', 'good', 'high', 'very high', 'extremely high']
+
+# Convert the 'Category' column to a categorical type with the specified order
+pie_df['Reading_Type'] = pd.Categorical(pie_df['Reading_Type'], categories=Reading_Type_order, ordered=True)
+
+# Sort the DataFrame by the 'Category' column
+pie_df = pie_df.sort_values('Reading_Type')
 
 ### Fig10
 labels = pie_df['Reading_Type']
 values = pie_df['Count']
 
-colors = ['#059212','#FCDC2A','#FF8400','#E72929']
+# Define specific colors for each category
+color_map = {
+    'low': '#ffffa1',
+    'good': '#3CCF4E',
+    'high': '#FF8E00',
+    'very high': '#E4003A',
+    'extremely high': '#6C0345'
+}
 
-fig10 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-
-fig10.update_traces(marker=dict(colors=colors, line=dict(color='#9DB2BF', width=1)))
+fig10 = px.pie(pie_df, values=values, names=labels,color='Reading_Type',
+               color_discrete_map=color_map,
+               category_orders={'Reading_Type': Reading_Type_order})
 
 fig10.update_layout(
     title={
-        'text': 'Rank Counts by Category',
+        'text': 'Counts by Category',
         'x': 0.5,  # Horizontal position of the title (0: left, 0.5: center, 1: right)
         'xanchor': 'center'  # Anchor point of the title text
     },
@@ -545,7 +583,7 @@ fig10.update_layout(
     )
 )
 
-col1, col2 = st.columns([2, 1])
+col1, col2 = st.columns([3, 2])
 with col1:
     st.plotly_chart(fig, use_container_width=True) 
 
