@@ -59,6 +59,8 @@ def cleaned_data(filename):
     # Convert column data types using the dictionary
     glucose_df = glucose_df.astype(data_type_dict, errors='ignore')
     
+    glucose_df['7_day Average'] = round(glucose_df['Weight'].rolling(window=7).mean(), 1)
+    
     return glucose_df
 
 glucose_df = cleaned_data('DiabetesTracker.xlsx')
@@ -215,10 +217,15 @@ fig1.update_layout(
 # Fig2
 
 # Define specific colors for each line
+# Define specific colors for each line
 colors = ['#758694']
 
-fig2 = px.line(glucose_df, x="Date", y="Weight", title='Weight',
+fig2 = px.line(glucose_df, x="Date", y=["Weight"], title='Weight',
               markers=True, color_discrete_sequence=colors)
+
+# Add the 7_day Weight line as a dotted line
+fig2.add_scatter(x=glucose_df["Date"], y=glucose_df["7_day Average"],
+                 mode='lines', name='7_day Average', line=dict(dash='dot', color='#758694'))
 
 fig2.update_layout(
     title = {'y':0.85,
@@ -228,15 +235,14 @@ fig2.update_layout(
 
 # Update layout to rename legend title
 fig2.update_layout(
-    legend_title_text='Time of Day'  ,
     yaxis_title='Weight (kg)'  # New y-axis title
 )
 
 # Update layout to move legend position on x-axis
 fig2.update_layout(
     legend=dict(
-        x=0.9,  # Position the legend horizontally at 50% of the plot width
-        y=0.95,
+        x=0.8,  # Position the legend horizontally at 50% of the plot width
+        y=0.6,
         xanchor='center',  # Center alignment of the legend
         yanchor='top'  # Align legend to the top of the plot
     )
@@ -457,31 +463,7 @@ fig9.add_shape(
     line=dict(color="green", width=1, dash="dash")
 )
 
-### Fig10
-labels = pie_df['Reading_Type']
-values = pie_df['Count']
 
-colors = ['#059212','#FCDC2A','#FF8400','#E72929']
-
-fig10 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-
-fig10.update_traces(marker=dict(colors=colors, line=dict(color='#9DB2BF', width=1)))
-
-fig10.update_layout(
-    title={
-        'text': 'Rank Counts by Category',
-        'x': 0.5,  # Horizontal position of the title (0: left, 0.5: center, 1: right)
-        'xanchor': 'center'  # Anchor point of the title text
-    },
-    legend=dict(
-        x=0.7,  # Position it horizontally (0: left, 1: right)
-        y=0.95,  # Position it vertically (0: bottom, 1: top)
-        xanchor='left',  # Use 'left', 'center', or 'right' for horizontal alignment
-        yanchor='middle',  # Use 'top', 'middle', or 'bottom' for vertical alignment
-        bordercolor='Black',  # Border color
-        borderwidth=1  # Border width
-    )
-)
 
 
 
@@ -511,13 +493,15 @@ with st.sidebar:
     text_0 = st.write("💻 This page displays the metrics relating to my Blood Glucose levels.")
     text_1 = st.write("📊 The graphs are interactive: hover for info, click and drag to zoom, click on legend to add or remove components.")
 
+    st.image('images/cpe1.png')
+    
     st.metric(label="Average of All Readings", value = f"{mean_all_time} mmol/L", delta_color="inverse")
    
     st.metric(label="Average of last 30 days Readings", value = f"{mean_last_30} mmol/L", delta = f"{diff_all} vs All Time", delta_color="inverse")
 
     st.metric(label="Average of last 7 days Readings", value = f"{mean_last_7} mmol/L", delta = f"{diff_30} vs last 30 days", delta_color="inverse")
     
-
+    
  
 # Charts
 
@@ -526,6 +510,41 @@ fig.update_yaxes(range=[0, 20])
 
 # Layout the Streamlit app with two columns
 # Create columns with specified proportions
+col1, col2, col3 = st.columns([4, 2, 2])
+
+with col1:
+    st.success('126 blood glucose readings have been recorded since 19 June 2024.', icon="🎯")
+
+with col3:
+    genre = st.radio("Select the pie chart's time horizon:",
+                    ["All Readings", "Last 30 days", "Last 7 days"])
+
+### Fig10
+labels = pie_df['Reading_Type']
+values = pie_df['Count']
+
+colors = ['#059212','#FCDC2A','#FF8400','#E72929']
+
+fig10 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+fig10.update_traces(marker=dict(colors=colors, line=dict(color='#9DB2BF', width=1)))
+
+fig10.update_layout(
+    title={
+        'text': 'Rank Counts by Category',
+        'x': 0.5,  # Horizontal position of the title (0: left, 0.5: center, 1: right)
+        'xanchor': 'center'  # Anchor point of the title text
+    },
+    legend=dict(
+        x=0.7,  # Position it horizontally (0: left, 1: right)
+        y=0.95,  # Position it vertically (0: bottom, 1: top)
+        xanchor='left',  # Use 'left', 'center', or 'right' for horizontal alignment
+        yanchor='middle',  # Use 'top', 'middle', or 'bottom' for vertical alignment
+        bordercolor='Black',  # Border color
+        borderwidth=1  # Border width
+    )
+)
+
 col1, col2 = st.columns([2, 1])
 with col1:
     st.plotly_chart(fig, use_container_width=True) 
@@ -568,90 +587,3 @@ with col1:
 with col2:
     st.plotly_chart(fig9, use_container_width=True)
     
-#
-#col1, col2 = st.columns(2)
-#
-#with col1:
-#    st.subheader('Session Metrics')
-#
-#    st.write("Sessions started:", consultants['Sessions'].sum())
-#    st.write("Unique interactions:", consultants['Total'].sum())
-#
-#    st.write("-- Recommendations:", consultants['Search'].sum())
-#    st.write("-- SKUs Copied:", consultants['Copy'].sum())
-#    st.write("-- Stock Searches:", consultants['Stock Search'].sum())
-#    st.write("-- Auto Populate:", consultants['Populate'].sum())
-#
-#with col2:
-#    st.subheader('Averages')
-#
-#    st.write("Recommendations per session:", round(float(consultants['Search'].sum()/consultants['Sessions'].sum()), 2))
-#    st.write("Copies per session:", round(float(consultants['Copy'].sum()/consultants['Sessions'].sum()), 2))
-#    st.write("Stock Searches per session:", round(float(consultants['Stock Search'].sum()/consultants['Sessions'].sum()), 2))
-#
-## Tables
-#
-#st.subheader('Barkeep Data')
-#st.markdown('The following tabs contain data relating to Consultant Interactions, Popular Products, Popular Customers.') 
-#
-#def convert_df(df):
-#    return df.to_csv()
-#
-#consultants_csv = convert_df(consultants)
-## popular_items_csv = convert_df(popular_items)
-## max_customers_csv = convert_df(max_customers)
-#
-#now = datetime.now()
-#dt_string = now.strftime("%d_%m_%Y")
-#
-#tab1, tab2, tab3 = st.tabs(["👩🏽‍💻 Consultants", "🍾 Products", "🥂 Customers"])
-#
-#with tab1:
-#    st.subheader('Consultant Interactions')
-#
-#    st.download_button(
-#        label = "Download as CSV",
-#        data = consultants_csv,
-#        file_name = str("consultants_" + dt_string + '.csv'),
-#        mime = 'text/csv')
-#
-#    st.dataframe(consultants)
-#
-#with tab2:
-#    st.subheader('Popular Products')
-#
-#    #st.download_button(
-    #    label = "Download as CSV",
-    #    data = popular_items_csv,
-    #    file_name = str("popular_items_" + dt_string + '.csv'),
-    #    mime = 'text/csv')
-#
-    #st.dataframe(popular_items)
-
-#with tab3:
-#    st.subheader('Popular Customers')
-#
-#    #st.download_button(
-#    #    label = "Download as CSV",
-#    #    data = max_customers_csv,
-#    #    file_name = str("popular_customers_" + dt_string + '.csv'),
-#    #    mime = 'text/csv')
-##
-#    #st.dataframe(max_customers)
-#
-## Retrieve user feedback to display below data tables
-#
-#st.subheader('📝 Consultant Feedback')
-#
-#with st.expander("Expand for Data"):
-#
-#    feedback = read_items(FEEDBACK_CONTAINER)
-#    feedback_df = feedback_item_list_to_df(feedback)
-#
-#    feedback_df['datetime'] = pd.to_datetime(feedback_df['_ts'] , unit = 's')
-#    feedback_df = feedback_df[['user_email', 'datetime', 'feedback_type', 'feedback']]
-#    feedback_df = feedback_df.sort_values(by = 'datetime', ascending = False).reset_index(drop = True)
-#    
-#    st.dataframe(feedback_df)
-#
-#print('feedback_df loaded')
