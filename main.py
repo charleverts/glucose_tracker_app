@@ -597,7 +597,7 @@ with col1:
 with col2:
     st.plotly_chart(fig2, use_container_width=True)
 
-st.plotly_chart(fig3)
+st.plotly_chart(fig3, use_container_width=True)
 
 # Set y-axis range for both figures
 fig4.update_yaxes(range=[0, 20])
