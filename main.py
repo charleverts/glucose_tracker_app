@@ -95,6 +95,7 @@ glucose_df_long['Rank'] = glucose_df_long['Value'].apply(value_to_rank)
 
 glucose_df_long = glucose_df_long.dropna()
 
+num_readings = glucose_df.shape[0]*4
 # Fig
 
 fig_cols_1 = ['Morning (07:15)', 'Lunch (12:50)',
@@ -237,34 +238,34 @@ fig2.update_layout(
 # Define specific colors for each line
 colors = ['#FFC7ED']
 
-fig3 = px.line(glucose_df, x="Date", y="Sleep", title='Sleep',
-              markers=True, color_discrete_sequence=colors)
-
-fig3.update_layout(
-    title = {'y':0.85,
-             'x':0.5,
-             'xanchor': 'center',
-             'yanchor': 'top'})
-
-# Update layout to rename legend title
-fig3.update_layout(
-    yaxis_title='Sleep'  # New y-axis title
-)
-
-# Update layout to change minimum value on y-axis
-fig3.update_layout(
-    yaxis=dict(title='Sleep Rating', range=[0, 10])  # Set minimum y-axis value to 50
-)
-
-# Update layout to move legend position on x-axis
-fig3.update_layout(
-    legend=dict(
-        x=0.9,  # Position the legend horizontally at 50% of the plot width
-        y=0.95,
-        xanchor='center',  # Center alignment of the legend
-        yanchor='top'  # Align legend to the top of the plot
-    )
-)
+# fig3 = px.line(glucose_df, x="Date", y="Sleep", title='Sleep',
+#               markers=True, color_discrete_sequence=colors)
+# 
+# fig3.update_layout(
+#     title = {'y':0.85,
+#              'x':0.5,
+#              'xanchor': 'center',
+#              'yanchor': 'top'})
+# 
+# # Update layout to rename legend title
+# fig3.update_layout(
+#     yaxis_title='Sleep'  # New y-axis title
+# )
+# 
+# # Update layout to change minimum value on y-axis
+# fig3.update_layout(
+#     yaxis=dict(title='Sleep Rating', range=[0, 10])  # Set minimum y-axis value to 50
+# )
+# 
+# # Update layout to move legend position on x-axis
+# fig3.update_layout(
+#     legend=dict(
+#         x=0.9,  # Position the legend horizontally at 50% of the plot width
+#         y=0.95,
+#         xanchor='center',  # Center alignment of the legend
+#         yanchor='top'  # Align legend to the top of the plot
+#     )
+# )
 
 ### Fig 4
 
@@ -492,7 +493,7 @@ fig.update_yaxes(range=[0, 20])
 col1, col2, col3 = st.columns([4, 1, 2])
 
 with col1:
-    st.success('126 Blood Glucose readings have been recorded since 19 June 2024.', icon="🎯")
+    st.success(f'{num_readings} Blood Glucose readings have been recorded since 19 June 2024.', icon="🎯")
 
 with col3:
     st.markdown("**Select the pie chart's time horizon:**")
@@ -592,12 +593,10 @@ with col2:
 
 col1, col2 = st.columns(2)
 with col1:
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig1, use_container_width=True)
 
 with col2:
-    st.plotly_chart(fig3, use_container_width=True)
-
-st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig2, use_container_width=True)
 
 # Set y-axis range for both figures
 fig4.update_yaxes(range=[0, 20])
