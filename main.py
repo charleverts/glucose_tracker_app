@@ -192,8 +192,8 @@ fig1.update_layout(
 # Update layout to move legend position on x-axis
 fig1.update_layout(
     legend=dict(
-        x=0.1,  # Position the legend horizontally at 50% of the plot width
-        y=0.4,
+        x=0.8,  # Position the legend horizontally at 50% of the plot width
+        y=0.9,
         xanchor='center',  # Center alignment of the legend
         yanchor='top'  # Align legend to the top of the plot
     )
@@ -525,9 +525,9 @@ def value_to_rank(value):
     elif 4 <= value < 7:
         return 'good'
     elif 7 <= value < 10:
-        return 'high'
+        return 'elevated'
     elif 10 <= value < 15:
-        return 'very high'
+        return 'high'
     elif value >= 15:
         return 'extremely high'
     
@@ -543,7 +543,7 @@ pie_df.rename(columns={'index': 'Reading_Type',
                        inplace = True)
 
 # Define the desired order
-Reading_Type_order = ['low', 'good', 'high', 'very high', 'extremely high']
+Reading_Type_order = ['low', 'good', 'elevated', 'high', 'extremely high']
 
 # Convert the 'Category' column to a categorical type with the specified order
 pie_df['Reading_Type'] = pd.Categorical(pie_df['Reading_Type'], categories=Reading_Type_order, ordered=True)
@@ -559,8 +559,8 @@ values = pie_df['Count']
 color_map = {
     'low': '#ffffa1',
     'good': '#3CCF4E',
-    'high': '#FF8E00',
-    'very high': '#E4003A',
+    'elevated': '#FF8E00',
+    'high': '#E4003A',
     'extremely high': '#6C0345'
 }
 
