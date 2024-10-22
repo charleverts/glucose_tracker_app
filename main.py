@@ -72,6 +72,19 @@ mean_last_7 = round(glucose_df.tail(7)[['Morning (07:15)', 'Lunch (12:50)', 'Din
 diff_all = round(mean_last_30 - mean_all_time, 1)
 diff_30 = round(mean_last_7 - mean_last_30, 1)
 
+hba1c_df = glucose_df[['Date','Morning (07:15)', 'Post Breakfast', 'Lunch (12:50)',
+       'Post Lunch', 'Dinner (18:30)', 'BedTime (21:45)']]
+
+hba1c_df = hba1c_df.dropna().reset_index(drop=True)
+
+hba1c_df['Day_avg_glucose'] = hba1c_df[['Morning (07:15)', 'Post Breakfast', 'Lunch (12:50)',
+       'Post Lunch', 'Dinner (18:30)', 'BedTime (21:45)']].mean(axis=1)
+
+# Calculate the average of the last 90 entries
+avg_last_90 = round(hba1c_df['Day_avg_glucose'].tail(90).mean(), 2)
+
+hba1c_value = round((avg_last_90 + 2.59)/1.59, 2)
+
 # Convert the DataFrame to long format for Plotly Express
 glucose_df_long = glucose_df[['Morning (07:15)','Lunch (12:50)', 
                               'Dinner (18:30)', 'BedTime (21:45)']]\
@@ -477,8 +490,10 @@ with st.sidebar:
 
     st.image('images/cpe1.png')
     
+    st.metric(label="Estimated HbA1c (3month)", value = f"{hba1c_value} %")
+    
     st.metric(label="Average of All Readings", value = f"{mean_all_time} mmol/L", delta_color="inverse")
-   
+    
     st.metric(label="Average of last 30 days Readings", value = f"{mean_last_30} mmol/L", delta = f"{diff_all} vs All Time", delta_color="inverse")
 
     st.metric(label="Average of last 7 days Readings", value = f"{mean_last_7} mmol/L", delta = f"{diff_30} vs last 30 days", delta_color="inverse")
